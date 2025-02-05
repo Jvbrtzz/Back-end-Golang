@@ -11,7 +11,7 @@ var Users []User
 
 type Card struct {
 	Id          int    `json:"id"`
-	User_id     string `json:"user_id"`
+	User_id     int    `json:"user_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Status      string `json:"status"`

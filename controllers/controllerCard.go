@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/Jvbrtzz/Back-end-golang/database"
@@ -37,4 +38,22 @@ func GetUserCardComments(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(comment)
+}
+
+func RegisterNewCard(w http.ResponseWriter, r *http.Request) {
+	var novoCard models.Card
+	if err := json.NewDecoder(r.Body).Decode(&novoCard); err != nil {
+		log.Printf("Erro ao decodificar o corpo da requisição: %v", err)
+		http.Error(w, "Dados inválidos", http.StatusBadRequest)
+		return
+	}
+
+	if err := database.DB.Create(&novoCard).Error; err != nil {
+		log.Printf("Erro ao criar o novo usuário no banco de dados: %v", err)
+		http.Error(w, "Erro ao registrar o usuário", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Usuário registrado com sucesso: %v", novoCard.Id)
+	json.NewEncoder(w).Encode(novoCard)
 }
