@@ -13,23 +13,41 @@ import (
 )
 
 func HandleRequest() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
 	PORT := os.Getenv("PORT")
+
 	r := mux.NewRouter()
 	r.Use(middleware.ContentTypeMiddleware)
+
+	r.Methods(http.MethodOptions).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.WriteHeader(http.StatusNoContent)
+	})
 
 	r.HandleFunc("/users", controllers.GetAllUsers).Methods("GET")
 	r.HandleFunc("/users/{id}", controllers.GetUsersById).Methods("GET")
 	r.HandleFunc("/registeruser", controllers.RegisterNewUser).Methods("POST")
+	r.HandleFunc("/userLogin", controllers.UserLogin).Methods("POST")
 
 	r.HandleFunc("/cards/{id}", controllers.GetUserCard).Methods("GET")
 	r.HandleFunc("/registercard", controllers.RegisterNewCard).Methods("POST")
 
 	r.HandleFunc("/comment/{id}", controllers.GetUserCardComments).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(PORT, handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(r)))
+	// Middleware de CORS aplicado corretamente
+	corsMiddleware := handlers.CORS(
+		handlers.AllowedOrigins([]string{"http://localhost:3000"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+		handlers.AllowCredentials(),
+	)
+
+	log.Printf("Servidor rodando na porta %s", PORT)
+	log.Fatal(http.ListenAndServe(PORT, corsMiddleware(r)))
 }

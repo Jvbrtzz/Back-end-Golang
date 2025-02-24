@@ -31,3 +31,10 @@ var Comments []Comment
 func (User) TableName() string {
 	return "user" // nome correto da tabela
 }
+
+type LoginResponse struct {
+	Success     bool   `json:"success"`
+	Message     string `json:"message"`
+	User        User   `json:"user"`
+	AccessToken string `json:"accessToken"`
+}
