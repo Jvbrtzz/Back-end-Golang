@@ -61,7 +61,7 @@ $ go run main.go
 
 ---
 
-## 📋 **Endpoints Disponíveis** (**EM CONSTRUÇÂO**)
+## 📋 **Endpoints Disponíveis** (**EM CONSTRUÇÃO**)
 
 ### 🔐 **Usuários**
 
