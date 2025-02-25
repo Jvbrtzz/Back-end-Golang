@@ -20,7 +20,7 @@ type Card struct {
 var Cards []Card
 
 type Comment struct {
-	Id      int    `json:"id"`
+	Id      int    `json:"id" gorm:"primaryKey"`
 	Card_id string `json:"card_id"`
 	User_id string `json:"user_id"`
 	Comment string `json:"comment"`
@@ -37,4 +37,13 @@ type LoginResponse struct {
 	Message     string `json:"message"`
 	User        User   `json:"user"`
 	AccessToken string `json:"accessToken"`
+}
+
+type CardUsers struct {
+	UserID     uint   `json:"user_id"`
+	CardID     uint   `json:"card_id"`
+	Permission string `json:"user_permission"`
+
+	// Adicionando o relacionamento com a struct User
+	User User `json:"user" gorm:"foreignKey:UserID;references:Id"`
 }

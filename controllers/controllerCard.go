@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -84,4 +85,32 @@ func RegisterNewCard(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Usuário registrado com sucesso: %v", novoCard.Id)
 	json.NewEncoder(w).Encode(novoCard)
+}
+
+func GetShareUserCard(w http.ResponseWriter, r *http.Request) {
+	var sharedUsers []struct {
+		UserID     uint   `json:"user_id"`
+		UserName   string `json:"user_name"`
+		UserEmail  string `json:"user_email"`
+		Permission string `json:"user_permission"`
+	}
+
+	vars := mux.Vars(r)
+	cardID := vars["id"]
+
+	fmt.Printf("Buscando usuários compartilhados para o card ID: %s\n", cardID) // Log no console
+
+	// Buscar os dados com Join
+	err := database.DB.Table("card_users").
+		Select("user.id as user_id, user.nome as user_name, user.email as user_email, card_users.permission as user_permission").
+		Joins("JOIN user ON user.id = card_users.user_id").
+		Where("card_users.card_id = ?", cardID).
+		Scan(&sharedUsers).Error
+
+	if err != nil {
+		http.Error(w, "Erro ao buscar os usuários compartilhados", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(sharedUsers)
 }

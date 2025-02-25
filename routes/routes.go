@@ -37,6 +37,7 @@ func HandleRequest() {
 
 	r.HandleFunc("/getUserCard/{id}", controllers.GetUserCard).Methods("GET")
 	r.HandleFunc("/sharedCards/{id}", controllers.GetSharedCardsForUser).Methods("GET")
+	r.HandleFunc("/sharedUsers/{id}", controllers.GetShareUserCard).Methods("GET")
 	r.HandleFunc("/registercard", controllers.RegisterNewCard).Methods("POST")
 
 	r.HandleFunc("/comment/{id}", controllers.GetCommentsByCard).Methods("GET")
