@@ -35,10 +35,11 @@ func HandleRequest() {
 	r.HandleFunc("/registeruser", controllers.RegisterNewUser).Methods("POST")
 	r.HandleFunc("/userLogin", controllers.UserLogin).Methods("POST")
 
-	r.HandleFunc("/cards/{id}", controllers.GetUserCard).Methods("GET")
+	r.HandleFunc("/getUserCard/{id}", controllers.GetUserCard).Methods("GET")
+	r.HandleFunc("/sharedCards/{id}", controllers.GetSharedCardsForUser).Methods("GET")
 	r.HandleFunc("/registercard", controllers.RegisterNewCard).Methods("POST")
 
-	r.HandleFunc("/comment/{id}", controllers.GetUserCardComments).Methods("GET")
+	r.HandleFunc("/comment/{id}", controllers.GetCommentsByCard).Methods("GET")
 
 	// Middleware de CORS aplicado corretamente
 	corsMiddleware := handlers.CORS(

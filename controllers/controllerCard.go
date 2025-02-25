@@ -25,19 +25,47 @@ func GetUserCard(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cards)
 }
 
-func GetUserCardComments(w http.ResponseWriter, r *http.Request) {
-	var comment []models.Comment
+func GetSharedCardsForUser(w http.ResponseWriter, r *http.Request) {
+	var sharedCards []models.Card
 
 	vars := mux.Vars(r)
-	id := vars["id"]
+	userID := vars["id"]
 
-	// Buscar todos os cards associados ao usuário
-	if err := database.DB.Where("card_id=?", id).Find(&comment).Error; err != nil {
-		http.Error(w, "Cards não encontrados", http.StatusNotFound)
+	// Buscar todos os cards compartilhados com o usuário
+	err := database.DB.
+		Joins("JOIN card_users cu ON cu.card_id = cards.id").
+		Where("cu.user_id = ?", userID).
+		Find(&sharedCards).Error
+
+	if err != nil {
+		log.Printf("Erro ao buscar os cards compartilhados: %v", err)
+		http.Error(w, "Erro ao buscar os cards compartilhados", http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(comment)
+	// Retorna os cards compartilhados como JSON
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(sharedCards)
+}
+
+func GetCommentsByCard(w http.ResponseWriter, r *http.Request) {
+	var comments []models.Comment
+
+	vars := mux.Vars(r)
+	cardID := vars["cardId"]
+
+	// Buscar todos os comentários associados ao card
+	err := database.DB.
+		Where("card_id = ?", cardID).Find(&comments).Error
+
+	if err != nil {
+		log.Printf("Erro ao buscar os comentários: %v", err)
+		http.Error(w, "Erro ao buscar os comentários", http.StatusInternalServerError)
+		return
+	}
+
+	// Retorna os comentários como JSON
+	json.NewEncoder(w).Encode(comments)
 }
 
 func RegisterNewCard(w http.ResponseWriter, r *http.Request) {
